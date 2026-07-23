@@ -2,11 +2,20 @@
 
 import { useRouter } from "next/navigation"
 import { UserPlus } from "lucide-react"
+import { useAuth } from "@/lib/auth-context"
 
 export function AddFriendButton() {
   const router = useRouter()
+  const { isAuthenticated } = useAuth()
 
   const handleAddFriend = () => {
+    if (!isAuthenticated) {
+      // Redirect to login if not authenticated
+      router.push("/login")
+      return
+    }
+    
+    // Redirect to verification if authenticated
     router.push("/verification")
   }
 
