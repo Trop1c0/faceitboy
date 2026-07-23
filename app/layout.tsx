@@ -2,6 +2,7 @@ import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { Chakra_Petch, Inter } from 'next/font/google'
 import './globals.css'
+import { AuthProvider } from '@/lib/auth-context'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })
 const chakraPetch = Chakra_Petch({
@@ -50,8 +51,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={`bg-background ${inter.variable} ${chakraPetch.variable}`}>
       <body className="font-sans antialiased">
-        {children}
-        {process.env.NODE_ENV === 'production' && <Analytics />}
+        <AuthProvider>
+          {children}
+          {process.env.NODE_ENV === 'production' && <Analytics />}
+        </AuthProvider>
       </body>
     </html>
   )
