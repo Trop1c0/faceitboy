@@ -3,8 +3,10 @@
 import type React from "react"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Eye, EyeOff, ChevronDown } from "lucide-react"
 import { FaceitLogo } from "@/components/faceit-logo"
+import { useAuth } from "@/lib/auth-context"
 
 function SteamIcon({ className }: { className?: string }) {
   return (
@@ -16,9 +18,18 @@ function SteamIcon({ className }: { className?: string }) {
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false)
+  const router = useRouter()
+  const { login } = useAuth()
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    login()
+    router.push("/")
+  }
+
+  function handleSteamLogin() {
+    login()
+    router.push("/")
   }
 
   return (
@@ -93,6 +104,7 @@ export function LoginForm() {
           {/* Steam */}
           <button
             type="button"
+            onClick={handleSteamLogin}
             className="flex h-11 w-full items-center justify-center gap-2 rounded-sm bg-foreground text-sm font-bold tracking-wide text-background transition-colors hover:bg-foreground/90"
           >
             <SteamIcon className="h-5 w-5" />
