@@ -1,11 +1,23 @@
-import { Search } from "lucide-react"
+"use client"
+
+import { Search, LogOut } from "lucide-react"
 import { FaceitLogo } from "@/components/faceit-logo"
+import { useAuth } from "@/lib/auth-context"
+import { useRouter } from "next/navigation"
 
 export function SiteHeader() {
+  const { isAuthenticated, logout } = useAuth()
+  const router = useRouter()
+
+  const handleLogout = () => {
+    logout()
+    router.push("/")
+  }
+
   return (
     <header className="absolute inset-x-0 top-0 z-50">
       <div className="mx-auto flex h-16 max-w-[1900px] items-center justify-between px-4 sm:px-6">
-        <a href="#" className="flex items-center">
+        <a href="/" className="flex items-center">
           <FaceitLogo className="text-2xl" />
         </a>
 
@@ -23,18 +35,31 @@ export function SiteHeader() {
           >
             DOWNLOAD CLIENT
           </a>
-          <a
-            href="#"
-            className="rounded-sm bg-primary px-4 py-2.5 text-xs font-bold tracking-widest text-primary-foreground transition-colors hover:bg-primary/90"
-          >
-            CREATE ACCOUNT
-          </a>
-          <a
-            href="/login"
-            className="rounded-sm bg-secondary px-4 py-2.5 text-xs font-bold tracking-widest text-secondary-foreground transition-colors hover:bg-secondary/80"
-          >
-            LOGIN
-          </a>
+          
+          {isAuthenticated ? (
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 rounded-sm bg-destructive px-4 py-2.5 text-xs font-bold tracking-widest text-destructive-foreground transition-colors hover:bg-destructive/90"
+            >
+              <LogOut className="h-4 w-4" />
+              LOGOUT
+            </button>
+          ) : (
+            <>
+              <a
+                href="#"
+                className="rounded-sm bg-primary px-4 py-2.5 text-xs font-bold tracking-widest text-primary-foreground transition-colors hover:bg-primary/90"
+              >
+                CREATE ACCOUNT
+              </a>
+              <a
+                href="/login"
+                className="rounded-sm bg-secondary px-4 py-2.5 text-xs font-bold tracking-widest text-secondary-foreground transition-colors hover:bg-secondary/80"
+              >
+                LOGIN
+              </a>
+            </>
+          )}
         </nav>
       </div>
     </header>
