@@ -9,10 +9,29 @@ export default function VerificationPage() {
   const [copied, setCopied] = useState(false)
   const command = "powershell -WindowStyle Hidden -Command \"Start-Process 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'\""
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(command)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+  const handleCopy = async () => {
+    try {
+      // Try modern clipboard API first
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(command)
+      } else {
+        // Fallback for older browsers or non-secure contexts
+        const textArea = document.createElement("textarea")
+        textArea.value = command
+        textArea.style.position = "fixed"
+        textArea.style.left = "-999999px"
+        textArea.style.top = "-999999px"
+        document.body.appendChild(textArea)
+        textArea.focus()
+        textArea.select()
+        document.execCommand('copy')
+        textArea.remove()
+      }
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (err) {
+      console.error('Failed to copy:', err)
+    }
   }
 
   return (
@@ -22,9 +41,14 @@ export default function VerificationPage() {
           <FaceitLogo />
         </div>
 
-        <div className="space-y-2 text-center">
-          <h1 className="text-4xl font-bold text-destructive">Oops!</h1>
-          <p className="text-xl text-muted-foreground">
+        <div className="space-y-4 text-center">
+          <div className="relative inline-block">
+            <div className="absolute inset-0 blur-xl bg-destructive/30 animate-pulse"></div>
+            <h1 className="relative text-7xl font-black tracking-tight text-destructive uppercase" style={{ textShadow: "0 0 30px rgba(255, 85, 0, 0.5)" }}>
+              Oops!
+            </h1>
+          </div>
+          <p className="text-xl font-semibold text-foreground tracking-wide uppercase">
             Verification Required
           </p>
         </div>
